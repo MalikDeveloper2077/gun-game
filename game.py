@@ -224,6 +224,12 @@ def new_game_elements():
     bullets = []
 
 
+def music():
+    """ Background music """
+    tracks = ['music/giorno.wav', 'music/giorno_christmas.wav', 'music/josuke.wav']
+    winsound.PlaySound(choice(tracks), winsound.SND_ALIAS | winsound.SND_ASYNC)
+
+
 def main():
     """ App interface and settings """
     global root, canvas, score
@@ -235,14 +241,11 @@ def main():
     canvas = tk.Canvas(root)
     canvas.pack(fill=tk.BOTH, expand=1)
 
-    # Music
-    tracks = ['music/giorno.wav', 'music/giorno_christmas.wav', 'music/josuke.wav']
-    winsound.PlaySound(choice(tracks), winsound.SND_ALIAS | winsound.SND_ASYNC)
-
     # Main score
     score = 0
 
     new_game_elements()
+    music()
     tick()
     root.mainloop()
 
