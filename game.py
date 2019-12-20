@@ -1,14 +1,17 @@
 from random import randint, choice
 import math
+import time
 import tkinter as tk
+import winsound
 
 WIDTH = 1200
 HEIGHT = 800
+MIN_TARGETS = 7
 MAX_TARGETS = 15
-TARGET_AND_BULLET_COLORS = ['green', 'red', 'black', 'blue', 'pink', 'yellow', 'magenta']
+TARGET_AND_BULLET_COLORS = ['green', 'red', 'black', 'blue', 'pink', 'yellow', 'magenta', 'cyan']
 GUN_X = 25
-GUN_Y = randint(20, HEIGHT - 20)
-BULLET_RADIUS = 7
+GUN_Y = randint(50, HEIGHT - 50)
+BULLET_RADIUS = 8
 
 
 class Gun:
@@ -23,12 +26,12 @@ class Gun:
         )
 
     def move(self):
-        """ Moving the gun along y
+        """ To move the gun along y
         Y of the gun increases on self.speed
         """
         self.y += self.speed
 
-        if self.y >= HEIGHT - 30 or self.y <= 30:
+        if self.y >= HEIGHT - 50 or self.y <= 50:
             self.speed = -self.speed
 
     def show(self):
@@ -52,7 +55,8 @@ class Gun:
 
     def shoot(self, event):
         """ To shoot bullets when button of mouse have clicked
-        Speed of bullet depends on power"""
+        Speed of bullet depends on power
+        """
         if self.angle >= 0.7:
             self.power = 80
         elif 0.5 <= self.angle <= 0.7:
@@ -90,22 +94,22 @@ class Bullet:
         )
 
     def move(self):
-        """ Moving the gun's bullet
+        """ To move the gun's bullet
         The method increases the x and y on speed
-        in one drawing frame
+        and remove part of speed in one drawing frame
         """
         self.x += self.speed_x
         self.y += self.speed_y
 
         if self.speed_x > 0:
-            self.speed_x -= 0.1
+            self.speed_x -= 0.25
         else:
-            self.speed_x += 0.1
+            self.speed_x += 0.25
 
         if self.speed_y > 0:
-            self.speed_y -= 0.1
+            self.speed_y -= 0.25
         else:
-            self.speed_y += 0.1
+            self.speed_y += 0.25
 
         if self.x + self.radius >= WIDTH or self.x - self.radius <= 20:
             self.speed_x = -self.speed_x
@@ -114,21 +118,33 @@ class Bullet:
             self.speed_y = -self.speed_y
 
     def show(self):
-        """ Shows bullet move on the canvas """
+        """ Show bullet move on the canvas """
         canvas.move(self.bullet_id, self.speed_x, self.speed_y)
 
-    def remove(self):
-        """ Check and Deletes the bullet after 7 seconds
-        if bullet speed equals 0
+    def hit(self):
+        """ Remove the target at bullet hit
+        Call the target.remove() and score += 1
         """
-        if -3 <= self.speed_x <= 3 or -3 <= self.speed_y <= 3:
+        global score
+
+        for target in targets:
+            if self.y <= target.y:
+                if self.x + self.radius >= target.x - target.radius \
+                        and (target.y - target.radius) - (self.y + self.radius) <= 0:
+                    target.remove()
+                    score += 1
+
+    def remove(self):
+        """ Check and Delete the bullet if -3 < speed < 3 """
+        if -3 <= self.speed_x <= 3 and -3 <= self.speed_y <= 3:
             bullets.remove(self)
+            canvas.delete(self.bullet_id)
             canvas.delete(self.bullet_id)
 
 
 class Target:
     def __init__(self):
-        self.radius = randint(10, 35)
+        self.radius = randint(13, 35)
         self.x = randint(WIDTH // 1.3, WIDTH - self.radius)
         self.y = randint(self.radius, HEIGHT - self.radius)
         self.speed_x = randint(7, 15)
@@ -140,7 +156,7 @@ class Target:
         )
 
     def move(self):
-        """ Moving the target every time which specified in tick()
+        """ To move the target every time which specified in tick()
         The method increases the x and y on speed_x and
         speed_y in one drawing frame
         """
@@ -154,46 +170,79 @@ class Target:
             self.speed_y = -self.speed_y
 
     def show(self):
-        """ Shows target move on the canvas """
+        """ Show target move on the canvas """
         canvas.move(self.target_id, self.speed_x, self.speed_y)
+
+    def remove(self):
+        """ Remove the target when bullet hit the target"""
+        targets.remove(self)
+        canvas.delete(self.target_id)
 
 
 def tick():
-    """ Method updates the canvas every 50 ms """
+    """ The method updates the canvas every 50 ms
+    Labels and call the canvas elements functions
+    """
+    # Labels
+    score_label = tk.Label(text=f"{score}", font=("Helvetica", 16))
+    score_label.place(x=20, y=20)
+
+    # Gun functions
     gun.move()
     gun.binds()
     gun.show()
 
-    for target in targets:
-        target.move()
-        target.show()
+    # Target functions
+    if targets:
+        for target in targets:
+            target.move()
+            target.show()
+    else:
+        for bullet in bullets:
+            canvas.delete(bullet.bullet_id)
+        canvas.delete(gun.gun_id)
+        bullets.clear()
+        new_game_elements()
+        time.sleep(0.5)
 
+    # Bullet functions
     if bullets:
         for bullet in bullets:
             bullet.move()
             bullet.show()
+            bullet.hit()
             bullet.remove()
 
     root.after(50, tick)
 
 
+def new_game_elements():
+    """ All elements on canvas """
+    global gun, targets, bullets
+    gun = Gun()
+    targets = [Target() for target in range(randint(MIN_TARGETS, MAX_TARGETS))]
+    bullets = []
+
+
 def main():
-    """ App interface and settings
-    Define elements on canvas
-    """
-    global root, canvas, gun, targets, bullets
+    """ App interface and settings """
+    global root, canvas, score
 
     root = tk.Tk()
     root.title("Gun Game")
     root.geometry(str(WIDTH) + "x" + str(HEIGHT))
+    root.iconbitmap('icon.ico')
     canvas = tk.Canvas(root)
     canvas.pack(fill=tk.BOTH, expand=1)
 
-    # All elements on canvas
-    gun = Gun()
-    targets = [Target() for target in range(randint(5, MAX_TARGETS))]
-    bullets = []
+    # Music
+    tracks = ['music/giorno.wav', 'music/giorno_christmas.wav', 'music/josuke.wav']
+    winsound.PlaySound(choice(tracks), winsound.SND_ALIAS | winsound.SND_ASYNC)
 
+    # Main score
+    score = 0
+
+    new_game_elements()
     tick()
     root.mainloop()
 
