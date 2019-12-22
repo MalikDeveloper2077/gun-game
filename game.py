@@ -123,7 +123,7 @@ class Bullet:
 
     def hit(self):
         """ Remove the target at bullet hit
-        Call the target.remove() and score += 1
+        Call the target.remove() and increase the score
         """
         global score
 
@@ -250,4 +250,5 @@ def main():
     root.mainloop()
 
 
-main()
+if __name__ == "__main__":
+    main()
