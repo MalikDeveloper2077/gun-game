@@ -15,6 +15,7 @@ BULLET_RADIUS = 8
 
 
 class Gun:
+    
     def __init__(self):
         self.x = GUN_X
         self.y = GUN_Y
@@ -81,6 +82,7 @@ class Gun:
 
 
 class Bullet:
+    
     def __init__(self, speed_x, speed_y, x, y):
         self.radius = BULLET_RADIUS
         self.x = x
@@ -144,6 +146,7 @@ class Bullet:
 
 
 class Target:
+    
     def __init__(self):
         self.radius = randint(13, 35)
         self.x = randint(WIDTH // 1.3, WIDTH - self.radius)
