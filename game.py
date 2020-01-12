@@ -26,7 +26,7 @@ class Gun:
         )
 
     def move(self):
-        """ To move the gun along y
+        """To move the gun along y.
         Y of the gun increases on self.speed
         """
         self.y += self.speed
@@ -35,11 +35,11 @@ class Gun:
             self.speed = -self.speed
 
     def show(self):
-        """ Show gun move """
+        """Show gun move"""
         canvas.move(self.gun_id, 0, self.speed)
 
     def aiming(self, event=0):
-        """ To aim at a target
+        """To aim at a target.
         Depends on mouse position
         """
         if event:
@@ -54,7 +54,7 @@ class Gun:
                       )
 
     def shoot(self, event):
-        """ To shoot bullets when button of mouse have clicked
+        """Shoot bullets when the <Button-1> is pressed.
         Speed of bullet depends on power
         """
         if self.angle >= 0.7:
@@ -75,7 +75,7 @@ class Gun:
         bullets.append(bullet)
 
     def binds(self):
-        """ All binds for gun """
+        """All binds for gun"""
         canvas.bind('<Motion>', self.aiming)
         canvas.bind('<Button-1>', self.shoot)
 
@@ -94,9 +94,11 @@ class Bullet:
         )
 
     def move(self):
-        """ To move the gun's bullet
+        """To move the gun's bullet.
+        
         The method increases the x and y on speed
         and remove part of speed in one drawing frame
+        
         """
         self.x += self.speed_x
         self.y += self.speed_y
@@ -118,11 +120,11 @@ class Bullet:
             self.speed_y = -self.speed_y
 
     def show(self):
-        """ Show bullet move on the canvas """
+        """Show bullet move on the canvas"""
         canvas.move(self.bullet_id, self.speed_x, self.speed_y)
 
     def hit(self):
-        """ Remove the target at bullet hit
+        """Remove the target at bullet hit.
         Call the target.remove() and increase the score
         """
         global score
@@ -135,10 +137,9 @@ class Bullet:
                     score += 1
 
     def remove(self):
-        """ Check and Delete the bullet if -3 < speed < 3 """
+        """Check and Delete the bullet if -3 < speed < 3"""
         if -3 <= self.speed_x <= 3 and -3 <= self.speed_y <= 3:
             bullets.remove(self)
-            canvas.delete(self.bullet_id)
             canvas.delete(self.bullet_id)
 
 
@@ -156,9 +157,11 @@ class Target:
         )
 
     def move(self):
-        """ To move the target every time which specified in tick()
+        """To move the target every time which specified in tick().
+        
         The method increases the x and y on speed_x and
         speed_y in one drawing frame
+        
         """
         self.x += self.speed_x
         self.y += self.speed_y
@@ -170,17 +173,17 @@ class Target:
             self.speed_y = -self.speed_y
 
     def show(self):
-        """ Show target move on the canvas """
+        """Show target move on the canvas"""
         canvas.move(self.target_id, self.speed_x, self.speed_y)
 
     def remove(self):
-        """ Remove the target when bullet hit the target"""
+        """Remove the target when bullet hit the target"""
         targets.remove(self)
         canvas.delete(self.target_id)
 
 
 def tick():
-    """ The method updates the canvas every 50 ms
+    """The method updates the canvas every 50 ms.
     Labels and call the canvas elements functions
     """
     # Labels
@@ -217,7 +220,7 @@ def tick():
 
 
 def new_game_elements():
-    """ All elements on canvas """
+    """All elements on the canvas"""
     global gun, targets, bullets
     gun = Gun()
     targets = [Target() for target in range(randint(MIN_TARGETS, MAX_TARGETS))]
@@ -225,15 +228,16 @@ def new_game_elements():
 
 
 def music():
-    """ Background music """
+    """Background music"""
     tracks = ['music/giorno.wav', 'music/giorno_christmas.wav', 'music/josuke.wav']
     winsound.PlaySound(choice(tracks), winsound.SND_ALIAS | winsound.SND_ASYNC)
 
 
 def main():
-    """ App interface and settings """
+    """App interface and settings"""
     global root, canvas, score
-
+    
+    # Settings
     root = tk.Tk()
     root.title("Gun Game")
     root.geometry(str(WIDTH) + "x" + str(HEIGHT))
@@ -244,6 +248,7 @@ def main():
     # Main score
     score = 0
 
+    # Call main methods
     new_game_elements()
     music()
     tick()
